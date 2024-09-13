@@ -3,8 +3,23 @@
 
 class NodeBase {
 public:
-    NodeBase(std::unique_ptr<NodeBase> left = nullptr, std::unique_ptr<NodeBase> right = nullptr);
-    virtual ~NodeBase() = default;
+    virtual int evaluate() const = 0;
+};
+
+class UnaryNodeBase : public NodeBase {
+public:
+    UnaryNodeBase(std::unique_ptr<NodeBase> next = nullptr);
+
+    virtual int evaluate() const = 0;
+
+protected:
+    std::unique_ptr<NodeBase> next;
+};
+
+class BinaryNodeBase : public NodeBase {
+public:
+    BinaryNodeBase(std::unique_ptr<NodeBase> left = nullptr, std::unique_ptr<NodeBase> right = nullptr);
+    virtual ~BinaryNodeBase() = default;
 
     virtual int evaluate() const = 0;
 
@@ -17,20 +32,27 @@ class NodeVal : public NodeBase {
 public:
     NodeVal(int val);
 
-    int evaluate() const override;
+    int evaluate() const override;  
 
 public:
     int val;
 };
 
-class NodeAdd : public NodeBase {
+class NodeAddInverse : public UnaryNodeBase {
+public:
+    NodeAddInverse(std::unique_ptr<NodeBase> next = nullptr);
+
+    int evaluate() const override;
+};
+
+class NodeAdd : public BinaryNodeBase {
 public:
     NodeAdd(std::unique_ptr<NodeBase> left = nullptr, std::unique_ptr<NodeBase> right = nullptr);
 
     int evaluate() const override;
 };
 
-class NodeMultiply : public NodeBase {
+class NodeMultiply : public BinaryNodeBase {
 public:
     NodeMultiply(std::unique_ptr<NodeBase> left = nullptr, std::unique_ptr<NodeBase> right = nullptr);
 
