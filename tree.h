@@ -58,3 +58,10 @@ public:
 
     int evaluate() const override;
 };
+
+class NodeExponent : public BinaryNodeBase {
+public:
+    NodeExponent(std::unique_ptr<NodeBase> left = nullptr, std::unique_ptr<NodeBase> right = nullptr);
+
+    int evaluate() const override;
+};

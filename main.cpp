@@ -12,5 +12,9 @@ int main() {
 
     std::unique_ptr<NodeAddInverse> addInverseNode = std::make_unique<NodeAddInverse>(std::move(multiplyNode));
 
-    std::cout << addInverseNode->evaluate() << std::endl;
+    std::unique_ptr<NodeVal> exp = std::make_unique<NodeVal>(2);
+
+    std::unique_ptr<NodeExponent> exponentNode = std::make_unique<NodeExponent>(std::move(addInverseNode), std::move(exp));
+
+    std::cout << exponentNode->evaluate() << std::endl;
 }

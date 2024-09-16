@@ -1,6 +1,7 @@
 #include "tree.h"
 
 #include <iostream>
+#include <cmath>
 
 UnaryNodeBase::UnaryNodeBase(std::unique_ptr<NodeBase> next)
     : next(std::move(next)) {
@@ -40,4 +41,13 @@ NodeMultiply::NodeMultiply(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeB
 
 int NodeMultiply::evaluate() const {
     return left->evaluate() * right->evaluate();
+}
+
+
+NodeExponent::NodeExponent(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right)
+    : BinaryNodeBase(std::move(left), std::move(right)) {
+}
+
+int NodeExponent::evaluate() const {
+    return pow(left->evaluate(), right->evaluate());
 }
