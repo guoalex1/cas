@@ -1,20 +1,12 @@
 #include <iostream>
 #include "tree.h"
+#include "parse.h"
+#include <string>
 
-int main() {
-    std::unique_ptr<NodeVal> leftNode = std::make_unique<NodeVal>(5);
-    std::unique_ptr<NodeVal> rightNode = std::make_unique<NodeVal>(3);
-    std::unique_ptr<NodeAdd> addNode = std::make_unique<NodeAdd>(std::move(leftNode), std::move(rightNode));
+int main(int argc, char** argv) {
+    std::string test = argv[1];
 
-    std::unique_ptr<NodeVal> valNode = std::make_unique<NodeVal>(-10);
+    std::unique_ptr<NodeBase> node = buildTree(test);
 
-    std::unique_ptr<NodeMultiply> multiplyNode = std::make_unique<NodeMultiply>(std::move(addNode), std::move(valNode));
-
-    std::unique_ptr<NodeAddInverse> addInverseNode = std::make_unique<NodeAddInverse>(std::move(multiplyNode));
-
-    std::unique_ptr<NodeVal> exp = std::make_unique<NodeVal>(2);
-
-    std::unique_ptr<NodeExponent> exponentNode = std::make_unique<NodeExponent>(std::move(addInverseNode), std::move(exp));
-
-    std::cout << exponentNode->evaluate() << std::endl;
+    std::cout << node->evaluate() << std::endl;
 }
