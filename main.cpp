@@ -1,42 +1,33 @@
-#include <iostream>
 #include "tree.h"
 #include "parse.h"
+#include <iostream>
 #include <string>
-#include <cctype>
+#include <sstream>
 
 using std::string;
 using std::cin;
 using std::cout;
 using std::endl;
 
-bool checkWhitespace(const char c) {
-    return std::isspace(static_cast<unsigned char>(c));
-}
-
-std::string removeWhitespace(const string& str) {
-    string result;
-
-    for (char c : str) {
-        if (! checkWhitespace(c)) {
-            result += c;
-        }
-    }
-
-    return result;
-}
-
 int main(int argc, char** argv) {
-    std::string expression;
 
     while (true) {
+        string line;
         cout << "Enter an expression (q to quit):" << endl;
-        std::getline(cin, expression);
+        std::getline(cin, line);
 
-        if (expression == "q") {
+        if (line == "q") {
             break;
         }
 
-        expression = removeWhitespace(expression);
+        string expression = "";
+        std::istringstream stream(line);
+        string temp;
+
+        while (stream >> temp) {
+            expression += temp;
+        }
+
         std::unique_ptr<NodeBase> node = buildTree(expression);
         cout << "= " << node->evaluate() << endl;
     }
