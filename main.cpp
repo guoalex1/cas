@@ -3,7 +3,6 @@
 #include "parse.h"
 #include <iostream>
 #include <string>
-#include <sstream>
 
 using std::string;
 using std::cin;
@@ -12,21 +11,13 @@ using std::endl;
 using std::vector;
 
 int main(int argc, char** argv) {
-    string line;
+    string expression;
 
     cout << "Enter an expression (q to quit):" << endl;
-    while (std::getline(cin, line)) {
+    while (std::getline(cin, expression)) {
 
-        if (line == "q") {
+        if (expression == "q") {
             break;
-        }
-
-        string expression = "";
-        std::istringstream stream(line);
-        string temp;
-
-        while (stream >> temp) {
-            expression += temp;
         }
 
         vector<Token> tokens = tokenize(expression);
