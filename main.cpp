@@ -1,4 +1,5 @@
 #include "tree.h"
+#include "token.h"
 #include "parse.h"
 #include <iostream>
 #include <string>
@@ -8,13 +9,13 @@ using std::string;
 using std::cin;
 using std::cout;
 using std::endl;
+using std::vector;
 
 int main(int argc, char** argv) {
+    string line;
 
-    while (true) {
-        string line;
-        cout << "Enter an expression (q to quit):" << endl;
-        std::getline(cin, line);
+    cout << "Enter an expression (q to quit):" << endl;
+    while (std::getline(cin, line)) {
 
         if (line == "q") {
             break;
@@ -28,8 +29,11 @@ int main(int argc, char** argv) {
             expression += temp;
         }
 
-        std::unique_ptr<NodeBase> node = buildTree(expression);
+        vector<Token> tokens = tokenize(expression);
+
+        std::unique_ptr<NodeBase> node = buildTree(tokens);
         cout << "= " << node->evaluate() << endl;
+        cout << "Enter an expression (q to quit):" << endl;
     }
 
     return 0;
