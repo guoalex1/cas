@@ -3,6 +3,8 @@
 #include <iostream>
 #include <cmath>
 
+
+
 UnaryNodeBase::UnaryNodeBase(std::unique_ptr<NodeBase> arg)
     : arg(std::move(arg)) {
 }
@@ -40,7 +42,7 @@ NodeSin::NodeSin(std::unique_ptr<NodeBase> arg)
 }
 
 int NodeSin::evaluate() const {
-    return sin(arg->evaluate());
+    return sin(arg->evaluate() * M_PI / 180); // convert to radians
 }
 
 NodeCos::NodeCos(std::unique_ptr<NodeBase> arg)
@@ -48,7 +50,7 @@ NodeCos::NodeCos(std::unique_ptr<NodeBase> arg)
 }
 
 int NodeCos::evaluate() const {
-    return cos(arg->evaluate());
+    return cos(arg->evaluate() * M_PI / 180);
 }
 
 NodeExp::NodeExp(std::unique_ptr<NodeBase> arg)
