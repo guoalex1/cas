@@ -3,8 +3,8 @@
 #include <iostream>
 #include <cmath>
 
-UnaryNodeBase::UnaryNodeBase(std::unique_ptr<NodeBase> next)
-    : next(std::move(next)) {
+UnaryNodeBase::UnaryNodeBase(std::unique_ptr<NodeBase> arg)
+    : arg(std::move(arg)) {
 }
 
 BinaryNodeBase::BinaryNodeBase(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right) 
@@ -19,12 +19,52 @@ int NodeVal::evaluate() const {
     return val;
 }
 
-NodeAddInverse::NodeAddInverse(std::unique_ptr<NodeBase> next)
-    : UnaryNodeBase(std::move(next)) {
+NodeVar::NodeVar(char symbol)
+    : symbol(symbol) {
+}
+
+int NodeVar::evaluate() const {
+    return 0;
+}
+
+NodeAddInverse::NodeAddInverse(std::unique_ptr<NodeBase> arg)
+    : UnaryNodeBase(std::move(arg)) {
 }
 
 int NodeAddInverse::evaluate() const {
-    return -1 * next->evaluate();
+    return -1 * arg->evaluate();
+}
+
+NodeSin::NodeSin(std::unique_ptr<NodeBase> arg)
+    : UnaryNodeBase(std::move(arg)) {
+}
+
+int NodeSin::evaluate() const {
+    return sin(arg->evaluate());
+}
+
+NodeCos::NodeCos(std::unique_ptr<NodeBase> arg)
+    : UnaryNodeBase(std::move(arg)) {
+}
+
+int NodeCos::evaluate() const {
+    return cos(arg->evaluate());
+}
+
+NodeExp::NodeExp(std::unique_ptr<NodeBase> arg)
+    : UnaryNodeBase(std::move(arg)) {
+}
+
+int NodeExp::evaluate() const {
+    return exp(arg->evaluate());
+}
+
+NodeLog::NodeLog(std::unique_ptr<NodeBase> arg)
+    : UnaryNodeBase(std::move(arg)) {
+}
+
+int NodeLog::evaluate() const {
+    return log(arg->evaluate());
 }
 
 NodeAdd::NodeAdd(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right)

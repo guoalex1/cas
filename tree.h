@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <cmath>
 
 class NodeBase {
 public:
@@ -9,12 +10,12 @@ public:
 
 class UnaryNodeBase : public NodeBase {
 public:
-    UnaryNodeBase(std::unique_ptr<NodeBase> next = nullptr);
+    UnaryNodeBase(std::unique_ptr<NodeBase> arg = nullptr);
 
     virtual int evaluate() const = 0;
 
 protected:
-    std::unique_ptr<NodeBase> next;
+    std::unique_ptr<NodeBase> arg;
 };
 
 class BinaryNodeBase : public NodeBase {
@@ -39,9 +40,47 @@ public:
     int val;
 };
 
+class NodeVar : public NodeBase {
+public:
+    NodeVar(char symbol);
+
+    int evaluate() const override;
+
+public:
+    char symbol;
+};
+
 class NodeAddInverse : public UnaryNodeBase {
 public:
-    NodeAddInverse(std::unique_ptr<NodeBase> next = nullptr);
+    NodeAddInverse(std::unique_ptr<NodeBase> arg = nullptr);
+
+    int evaluate() const override;
+};
+
+class NodeSin : public UnaryNodeBase {
+public:
+    NodeSin(std::unique_ptr<NodeBase> arg = nullptr);
+
+    int evaluate() const override;
+};
+
+class NodeCos : public UnaryNodeBase {
+public:
+    NodeCos(std::unique_ptr<NodeBase> arg = nullptr);
+
+    int evaluate() const override;
+};
+
+class NodeExp : public UnaryNodeBase {
+public:
+    NodeExp(std::unique_ptr<NodeBase> arg = nullptr);
+
+    int evaluate() const override;
+};
+
+class NodeLog : public UnaryNodeBase {
+public:
+    NodeLog(std::unique_ptr<NodeBase> arg = nullptr);
 
     int evaluate() const override;
 };
