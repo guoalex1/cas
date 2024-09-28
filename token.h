@@ -3,11 +3,12 @@
 #include <string>
 #include <vector>
 
-enum class TokenType {Number, Add, Subtract, Multiply, Exponent, OpenParentheses, CloseParentheses};
+enum class TokenType {Number, Add, Subtract, Multiply, Exponent, OpenParentheses, CloseParentheses, Variable, Function};
 
 struct Token {
     TokenType type;
-    int val; // only if type is TokenType::Number
+    int val; // if type is TokenType::Number
+    std::string name; // if type is TokenType::Variable or TokenType::Function
 };
 
 std::vector<Token> tokenize(const std::string& expression);

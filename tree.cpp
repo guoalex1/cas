@@ -50,7 +50,7 @@ NodeCos::NodeCos(std::unique_ptr<NodeBase> arg)
 }
 
 int NodeCos::evaluate() const {
-    return cos(arg->evaluate() * M_PI / 180);
+    return cos(arg->evaluate() * M_PI / 180); // convert to radians
 }
 
 NodeExp::NodeExp(std::unique_ptr<NodeBase> arg)
