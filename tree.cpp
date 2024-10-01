@@ -3,93 +3,181 @@
 #include <iostream>
 #include <cmath>
 
+using std::string;
 
-
-UnaryNodeBase::UnaryNodeBase(std::unique_ptr<NodeBase> arg)
-    : arg(std::move(arg)) {
+NodeBase::NodeBase(int precedence)
+    : precedence(precedence) {
 }
 
-BinaryNodeBase::BinaryNodeBase(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right) 
-    : left(std::move(left)), right(std::move(right)) {
+UnaryNodeBase::UnaryNodeBase(std::unique_ptr<NodeBase> arg, int precedence)
+    : NodeBase(precedence), arg(std::move(arg)) {
 }
 
-NodeVal::NodeVal(int val) 
-    : val(val) {
+BinaryNodeBase::BinaryNodeBase(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence)
+    : NodeBase(precedence), left(std::move(left)), right(std::move(right)) {
+}
+
+NodeVal::NodeVal(int val, int precedence) 
+    : NodeBase(precedence), val(val) {
 }
 
 int NodeVal::evaluate() const {
     return val;
 }
 
-NodeVar::NodeVar(char symbol)
-    : symbol(symbol) {
+string NodeVal::toString() const {
+    return std::to_string(val);
+}
+
+NodeVar::NodeVar(char symbol, int precedence)
+    : NodeBase(precedence), symbol(symbol) {
 }
 
 int NodeVar::evaluate() const {
     return 0;
 }
 
-NodeAddInverse::NodeAddInverse(std::unique_ptr<NodeBase> arg)
-    : UnaryNodeBase(std::move(arg)) {
+string NodeVar::toString() const {
+    return string(1, symbol);
+}
+
+NodeAddInverse::NodeAddInverse(std::unique_ptr<NodeBase> arg, int precedence)
+    : UnaryNodeBase(std::move(arg), precedence) {
 }
 
 int NodeAddInverse::evaluate() const {
     return -1 * arg->evaluate();
 }
 
-NodeSin::NodeSin(std::unique_ptr<NodeBase> arg)
-    : UnaryNodeBase(std::move(arg)) {
+string NodeAddInverse::toString() const {
+    return arg->precedence < precedence ? arg->toString() : "-(" + arg->toString() + ")";
+}
+
+NodeSin::NodeSin(std::unique_ptr<NodeBase> arg, int precedence)
+    : UnaryNodeBase(std::move(arg), precedence) {
 }
 
 int NodeSin::evaluate() const {
     return sin(arg->evaluate() * M_PI / 180); // convert to radians
 }
 
-NodeCos::NodeCos(std::unique_ptr<NodeBase> arg)
-    : UnaryNodeBase(std::move(arg)) {
+string NodeSin::toString() const {
+    return "sin(" + arg->toString() + ")";
+}
+
+NodeCos::NodeCos(std::unique_ptr<NodeBase> arg, int precedence)
+    : UnaryNodeBase(std::move(arg), precedence) {
 }
 
 int NodeCos::evaluate() const {
     return cos(arg->evaluate() * M_PI / 180); // convert to radians
 }
 
-NodeExp::NodeExp(std::unique_ptr<NodeBase> arg)
-    : UnaryNodeBase(std::move(arg)) {
+string NodeCos::toString() const {
+    return "cos(" + arg->toString() + ")";
+}
+
+NodeExp::NodeExp(std::unique_ptr<NodeBase> arg, int precedence)
+    : UnaryNodeBase(std::move(arg), precedence) {
 }
 
 int NodeExp::evaluate() const {
     return exp(arg->evaluate());
 }
 
-NodeLog::NodeLog(std::unique_ptr<NodeBase> arg)
-    : UnaryNodeBase(std::move(arg)) {
+string NodeExp::toString() const {
+    return "exp(" + arg->toString() + ")";
+}
+
+NodeLog::NodeLog(std::unique_ptr<NodeBase> arg, int precedence)
+    : UnaryNodeBase(std::move(arg), precedence) {
 }
 
 int NodeLog::evaluate() const {
     return log(arg->evaluate());
 }
 
-NodeAdd::NodeAdd(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right)
-    : BinaryNodeBase(std::move(left), std::move(right)) {
+string NodeLog::toString() const {
+    return "log(" + arg->toString() + ")";
+}
+
+NodeAdd::NodeAdd(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence)
+    : BinaryNodeBase(std::move(left), std::move(right), precedence) {
 }
 
 int NodeAdd::evaluate() const {
     return left->evaluate() + right->evaluate();
 }
 
-NodeMultiply::NodeMultiply(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right)
-    : BinaryNodeBase(std::move(left), std::move(right)) {
+string NodeAdd::toString() const {
+    string leftString;
+    string rightString;
+
+    if (left->precedence < precedence) {
+        leftString = "(" + left->toString() + ")";
+    } else {
+        leftString = left->toString();
+    }
+
+    if (right->precedence < precedence) {
+        rightString = "(" + right->toString() + ")";
+    } else {
+        rightString = right->toString();
+    }
+
+    return leftString + "+" + rightString;
+}
+
+NodeMultiply::NodeMultiply(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence)
+    : BinaryNodeBase(std::move(left), std::move(right), precedence) {
 }
 
 int NodeMultiply::evaluate() const {
     return left->evaluate() * right->evaluate();
 }
 
+string NodeMultiply::toString() const {
+    string leftString;
+    string rightString;
 
-NodeExponent::NodeExponent(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right)
-    : BinaryNodeBase(std::move(left), std::move(right)) {
+    if (left->precedence < precedence) {
+        leftString = "(" + left->toString() + ")";
+    } else {
+        leftString = left->toString();
+    }
+
+    if (right->precedence < precedence) {
+        rightString = "(" + right->toString() + ")";
+    } else {
+        rightString = right->toString();
+    }
+
+    return leftString + "*" + rightString;
+}
+
+NodeExponent::NodeExponent(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence)
+    : BinaryNodeBase(std::move(left), std::move(right), precedence) {
 }
 
 int NodeExponent::evaluate() const {
     return pow(left->evaluate(), right->evaluate());
+}
+
+string NodeExponent::toString() const {
+    string leftString;
+    string rightString;
+
+    if (left->precedence < precedence) {
+        leftString = "(" + left->toString() + ")";
+    } else {
+        leftString = left->toString();
+    }
+
+    if (right->precedence <= precedence) {
+        rightString = "(" + right->toString() + ")";
+    } else {
+        rightString = right->toString();
+    }
+
+    return leftString + "^" + rightString;
 }
