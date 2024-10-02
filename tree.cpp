@@ -50,7 +50,11 @@ int NodeAddInverse::evaluate() const {
 }
 
 string NodeAddInverse::toString() const {
-    return arg->precedence < precedence ? arg->toString() : "-(" + arg->toString() + ")";
+    if (precedence > arg->precedence) {
+        return "-(" + arg->toString() + ")";
+    } else {
+        return "-" + arg->toString();
+    }
 }
 
 NodeSin::NodeSin(std::unique_ptr<NodeBase> arg, int precedence)

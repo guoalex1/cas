@@ -56,28 +56,42 @@ std::unique_ptr<NodeBase> parseExpressionExponent(const std::vector<Token>& toke
 }
 
 std::unique_ptr<NodeBase> parseExpressionVal(const std::vector<Token>& tokens, unsigned int& pos) {
+    bool negate = false;
+
+    while (tokens[pos].type == TokenType::Subtract) {
+        negate = ! negate;
+
+        ++pos;
+    }
+
+    std::unique_ptr<NodeBase> node;
+
     if (tokens[pos].type == TokenType::OpenParentheses) {
         ++pos; // skip (
-        std::unique_ptr<NodeBase> node = parseExpressionAddition(tokens, pos);
+        node = parseExpressionAddition(tokens, pos);
         ++pos; // skip )
-
-        return node;
     } else if (tokens[pos].type == TokenType::Function) {
         std::string function = tokens[pos++].name;
         std::unique_ptr<NodeBase> arg = parseExpressionVal(tokens, pos);
 
         if (function == "sin") {
-            return std::make_unique<NodeSin>(std::move(arg));
+            node = std::make_unique<NodeSin>(std::move(arg));
         } else if (function == "cos") {
-            return std::make_unique<NodeCos>(std::move(arg));
+            node = std::make_unique<NodeCos>(std::move(arg));
         } else if (function == "exp") {
-            return std::make_unique<NodeExp>(std::move(arg));
+            node = std::make_unique<NodeExp>(std::move(arg));
         } else if (function == "log") {
-            return std::make_unique<NodeLog>(std::move(arg));
+            node = std::make_unique<NodeLog>(std::move(arg));
         }
     } else if (tokens[pos].type == TokenType::Variable) {
-        return std::make_unique<NodeVar>(tokens[pos++].name[0]);
+        node = std::make_unique<NodeVar>(tokens[pos++].name[0]);
     } else {
-        return std::make_unique<NodeVal>(tokens[pos++].val);
+        node = std::make_unique<NodeVal>(tokens[pos++].val);
+    }
+
+    if (negate) {
+        return std::make_unique<NodeAddInverse>(std::move(node));
+    } else {
+        return node;
     }
 }

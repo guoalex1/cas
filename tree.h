@@ -4,6 +4,15 @@
 #include <cmath>
 #include <string>
 
+/*
+Precedence for nodes (order of operations):
+5: NodeVal, NodeVar
+4: Functions, NodeAddInverse
+3: NodeExponent
+2: NodeMultiply, NodeDivide
+1: NodeAdd, NodeSubtract
+*/
+
 class NodeBase {
 public:
     NodeBase(int precedence);
@@ -64,7 +73,7 @@ public:
 
 class NodeAddInverse : public UnaryNodeBase {
 public:
-    NodeAddInverse(std::unique_ptr<NodeBase> arg = nullptr, int precedence = 1);
+    NodeAddInverse(std::unique_ptr<NodeBase> arg = nullptr, int precedence = 4);
 
     int evaluate() const override;
 
