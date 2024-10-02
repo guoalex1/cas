@@ -128,6 +128,33 @@ string NodeAdd::toString() const {
     return leftString + "+" + rightString;
 }
 
+NodeSubtract::NodeSubtract(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence)
+    : BinaryNodeBase(std::move(left), std::move(right), precedence) {
+}
+
+int NodeSubtract::evaluate() const {
+    return left->evaluate() - right->evaluate();
+}
+
+string NodeSubtract::toString() const {
+    string leftString;
+    string rightString;
+
+    if (left->precedence < precedence) {
+        leftString = "(" + left->toString() + ")";
+    } else {
+        leftString = left->toString();
+    }
+
+    if (right->precedence < precedence) {
+        rightString = "(" + right->toString() + ")";
+    } else {
+        rightString = right->toString();
+    }
+
+    return leftString + "-" + rightString;
+}
+
 NodeMultiply::NodeMultiply(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence)
     : BinaryNodeBase(std::move(left), std::move(right), precedence) {
 }
@@ -153,6 +180,33 @@ string NodeMultiply::toString() const {
     }
 
     return leftString + "*" + rightString;
+}
+
+NodeDivide::NodeDivide(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence)
+    : BinaryNodeBase(std::move(left), std::move(right), precedence) {
+}
+
+int NodeDivide::evaluate() const {
+    return left->evaluate() / right->evaluate();
+}
+
+string NodeDivide::toString() const {
+    string leftString;
+    string rightString;
+
+    if (left->precedence < precedence) {
+        leftString = "(" + left->toString() + ")";
+    } else {
+        leftString = left->toString();
+    }
+
+    if (right->precedence < precedence) {
+        rightString = "(" + right->toString() + ")";
+    } else {
+        rightString = right->toString();
+    }
+
+    return leftString + "/" + rightString;
 }
 
 NodeExponent::NodeExponent(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence)

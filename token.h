@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-enum class TokenType {Number, Add, Subtract, Multiply, Exponent, OpenParentheses, CloseParentheses, Variable, Function};
+enum class TokenType {Number, Add, Subtract, Multiply, Divide, Exponent, OpenParentheses, CloseParentheses, Variable, Function};
 
 struct Token {
     TokenType type;

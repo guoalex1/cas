@@ -18,7 +18,7 @@ std::unique_ptr<NodeBase> parseExpressionAddition(const std::vector<Token>& toke
         if (operation == TokenType::Add) {
             node = std::make_unique<NodeAdd>(std::move(node), std::move(right));
         } else if (operation == TokenType::Subtract) {
-            node = std::make_unique<NodeAdd>(std::move(node), std::make_unique<NodeAddInverse>(std::move(right))); 
+            node = std::make_unique<NodeSubtract>(std::move(node), std::move(right));
         }
     }
 
@@ -28,12 +28,16 @@ std::unique_ptr<NodeBase> parseExpressionAddition(const std::vector<Token>& toke
 std::unique_ptr<NodeBase> parseExpressionMultiplication(const std::vector<Token>& tokens, unsigned int& pos) {
     std::unique_ptr<NodeBase> node = parseExpressionExponent(tokens, pos);
 
-    // TODO: Implement division
-    while (tokens[pos].type == TokenType::Multiply) {
+    while (tokens[pos].type == TokenType::Multiply || tokens[pos].type == TokenType::Divide) {
         TokenType operation = tokens[pos].type; // Unused for now
         ++pos;
         std::unique_ptr<NodeBase> right = parseExpressionExponent(tokens, pos);
-        node = std::make_unique<NodeMultiply>(std::move(node), std::move(right));
+
+        if (operation == TokenType::Multiply) {
+            node = std::make_unique<NodeMultiply>(std::move(node), std::move(right));
+        } else if (operation == TokenType::Divide) {
+            node = std::make_unique<NodeDivide>(std::move(node), std::move(right));
+        }
     }
 
     return node;

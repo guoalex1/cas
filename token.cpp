@@ -39,6 +39,8 @@ vector<Token> tokenize(const string& expression) {
                 tokens.push_back(Token{TokenType::Subtract, 0, ""});
             } else if (c == '*') {
                 tokens.push_back(Token{TokenType::Multiply, 0, ""});
+            } else if (c == '/') {
+                tokens.push_back(Token{TokenType::Divide, 0, ""});
             } else if (c == '^') {
                 tokens.push_back(Token{TokenType::Exponent, 0, ""});
             } else if (c == '(') {

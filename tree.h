@@ -116,9 +116,27 @@ public:
     std::string toString() const override;
 };
 
+class NodeSubtract : public BinaryNodeBase {
+public:
+    NodeSubtract(std::unique_ptr<NodeBase> left = nullptr, std::unique_ptr<NodeBase> right = nullptr, int precedence = 1);
+
+    int evaluate() const override;
+
+    std::string toString() const override;
+};
+
 class NodeMultiply : public BinaryNodeBase {
 public:
     NodeMultiply(std::unique_ptr<NodeBase> left = nullptr, std::unique_ptr<NodeBase> right = nullptr, int precedence = 2);
+
+    int evaluate() const override;
+
+    std::string toString() const override;
+};
+
+class NodeDivide : public BinaryNodeBase {
+public:
+    NodeDivide(std::unique_ptr<NodeBase> left = nullptr, std::unique_ptr<NodeBase> right = nullptr, int precedence = 2);
 
     int evaluate() const override;
 
