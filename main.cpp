@@ -9,6 +9,7 @@ using std::cin;
 using std::cout;
 using std::endl;
 using std::vector;
+using std::unique_ptr;
 
 int main(int argc, char** argv) {
     string expression;
@@ -23,7 +24,7 @@ int main(int argc, char** argv) {
         vector<Token> tokens = tokenize(expression);
 
         if (! tokens.empty()) {
-            std::unique_ptr<NodeBase> node = buildTree(tokens);
+            unique_ptr<NodeBase> node = buildTree(tokens);
             cout << "= " << node->evaluate() << endl;
         }
 

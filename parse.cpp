@@ -1,19 +1,21 @@
 #include "parse.h"
 #include <iostream>
 
-std::unique_ptr<NodeBase> buildTree(const std::vector<Token>& tokens) {
+using std::unique_ptr;
+
+unique_ptr<NodeBase> buildTree(const std::vector<Token>& tokens) {
     unsigned int pos = 0;
 
     return parseExpressionAddition(tokens, pos);
 }
 
-std::unique_ptr<NodeBase> parseExpressionAddition(const std::vector<Token>& tokens, unsigned int& pos) {
-    std::unique_ptr<NodeBase> node = parseExpressionMultiplication(tokens, pos);
+unique_ptr<NodeBase> parseExpressionAddition(const std::vector<Token>& tokens, unsigned int& pos) {
+    unique_ptr<NodeBase> node = parseExpressionMultiplication(tokens, pos);
 
     while (tokens[pos].type == TokenType::Add || tokens[pos].type == TokenType::Subtract) {
         TokenType operation = tokens[pos].type;
         ++pos;
-        std::unique_ptr<NodeBase> right = parseExpressionMultiplication(tokens, pos);
+        unique_ptr<NodeBase> right = parseExpressionMultiplication(tokens, pos);
 
         if (operation == TokenType::Add) {
             node = std::make_unique<NodeAdd>(std::move(node), std::move(right));
@@ -25,13 +27,13 @@ std::unique_ptr<NodeBase> parseExpressionAddition(const std::vector<Token>& toke
     return node;
 }
 
-std::unique_ptr<NodeBase> parseExpressionMultiplication(const std::vector<Token>& tokens, unsigned int& pos) {
-    std::unique_ptr<NodeBase> node = parseExpressionExponent(tokens, pos);
+unique_ptr<NodeBase> parseExpressionMultiplication(const std::vector<Token>& tokens, unsigned int& pos) {
+    unique_ptr<NodeBase> node = parseExpressionExponent(tokens, pos);
 
     while (tokens[pos].type == TokenType::Multiply || tokens[pos].type == TokenType::Divide) {
         TokenType operation = tokens[pos].type; // Unused for now
         ++pos;
-        std::unique_ptr<NodeBase> right = parseExpressionExponent(tokens, pos);
+        unique_ptr<NodeBase> right = parseExpressionExponent(tokens, pos);
 
         if (operation == TokenType::Multiply) {
             node = std::make_unique<NodeMultiply>(std::move(node), std::move(right));
@@ -43,19 +45,19 @@ std::unique_ptr<NodeBase> parseExpressionMultiplication(const std::vector<Token>
     return node;
 }
 
-std::unique_ptr<NodeBase> parseExpressionExponent(const std::vector<Token>& tokens, unsigned int& pos) {
-    std::unique_ptr<NodeBase> node = parseExpressionVal(tokens, pos);
+unique_ptr<NodeBase> parseExpressionExponent(const std::vector<Token>& tokens, unsigned int& pos) {
+    unique_ptr<NodeBase> node = parseExpressionVal(tokens, pos);
 
     while (tokens[pos].type == TokenType::Exponent) {
         ++pos;
-        std::unique_ptr<NodeBase> right = parseExpressionVal(tokens, pos);
+        unique_ptr<NodeBase> right = parseExpressionVal(tokens, pos);
         node = std::make_unique<NodeExponent>(std::move(node), std::move(right));
     }
 
     return node;
 }
 
-std::unique_ptr<NodeBase> parseExpressionVal(const std::vector<Token>& tokens, unsigned int& pos) {
+unique_ptr<NodeBase> parseExpressionVal(const std::vector<Token>& tokens, unsigned int& pos) {
     bool negate = false;
 
     while (tokens[pos].type == TokenType::Subtract) {
@@ -64,7 +66,7 @@ std::unique_ptr<NodeBase> parseExpressionVal(const std::vector<Token>& tokens, u
         ++pos;
     }
 
-    std::unique_ptr<NodeBase> node;
+    unique_ptr<NodeBase> node;
 
     if (tokens[pos].type == TokenType::OpenParentheses) {
         ++pos; // skip (
@@ -72,7 +74,7 @@ std::unique_ptr<NodeBase> parseExpressionVal(const std::vector<Token>& tokens, u
         ++pos; // skip )
     } else if (tokens[pos].type == TokenType::Function) {
         std::string function = tokens[pos++].name;
-        std::unique_ptr<NodeBase> arg = parseExpressionVal(tokens, pos);
+        unique_ptr<NodeBase> arg = parseExpressionVal(tokens, pos);
 
         if (function == "sin") {
             node = std::make_unique<NodeSin>(std::move(arg));

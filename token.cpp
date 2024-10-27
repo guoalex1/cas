@@ -8,7 +8,7 @@ vector<Token> tokenize(const string& expression) {
     vector<Token> tokens;
     unsigned int pos = 0;
 
-    std::unordered_set<string> functions = {"sin", "cos", "exp", "log"};
+    const std::unordered_set<string> functions = {"sin", "cos", "exp", "log"};
 
     while (pos < expression.length()) {
         char c = expression[pos];
