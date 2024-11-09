@@ -22,13 +22,16 @@ public:
 
     virtual std::string toString() const = 0;
 
+    virtual std::unique_ptr<NodeBase> clone() const = 0;
+
 public:
     const int precedence;
 };
 
 class UnaryNodeBase : public NodeBase {
 public:
-    UnaryNodeBase(std::unique_ptr<NodeBase> arg = nullptr, int precedence = 0);
+    UnaryNodeBase(std::unique_ptr<NodeBase> arg, int precedence = 0);
+    virtual ~UnaryNodeBase() = default;
 
     virtual int evaluate() const = 0;
 
@@ -38,7 +41,8 @@ protected:
 
 class BinaryNodeBase : public NodeBase {
 public:
-    BinaryNodeBase(std::unique_ptr<NodeBase> left = nullptr, std::unique_ptr<NodeBase> right = nullptr, int precedence = 0);
+    BinaryNodeBase(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence = 0);
+    virtual ~BinaryNodeBase() = default;
 
     virtual int evaluate() const = 0;
 
@@ -55,6 +59,8 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> clone() const override;
+
 public:
     int val;
 };
@@ -67,96 +73,118 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> clone() const override;
+
 public:
     char symbol;
 };
 
 class NodeAddInverse : public UnaryNodeBase {
 public:
-    NodeAddInverse(std::unique_ptr<NodeBase> arg = nullptr, int precedence = 4);
+    NodeAddInverse(std::unique_ptr<NodeBase> arg, int precedence = 4);
 
     int evaluate() const override;
 
     std::string toString() const override;
+
+    std::unique_ptr<NodeBase> clone() const override;
 };
 
 class NodeSin : public UnaryNodeBase {
 public:
-    NodeSin(std::unique_ptr<NodeBase> arg = nullptr, int precedence = 4);
+    NodeSin(std::unique_ptr<NodeBase> arg, int precedence = 4);
 
     int evaluate() const override;
 
     std::string toString() const override;
+
+    std::unique_ptr<NodeBase> clone() const override;
 };
 
 class NodeCos : public UnaryNodeBase {
 public:
-    NodeCos(std::unique_ptr<NodeBase> arg = nullptr, int precedence = 4);
+    NodeCos(std::unique_ptr<NodeBase> arg, int precedence = 4);
 
     int evaluate() const override;
 
     std::string toString() const override;
+
+    std::unique_ptr<NodeBase> clone() const override;
 };
 
 class NodeExp : public UnaryNodeBase {
 public:
-    NodeExp(std::unique_ptr<NodeBase> arg = nullptr, int precedence = 4);
+    NodeExp(std::unique_ptr<NodeBase> arg, int precedence = 4);
 
     int evaluate() const override;
 
     std::string toString() const override;
+
+    std::unique_ptr<NodeBase> clone() const override;
 };
 
 class NodeLog : public UnaryNodeBase {
 public:
-    NodeLog(std::unique_ptr<NodeBase> arg = nullptr, int precedence = 4);
+    NodeLog(std::unique_ptr<NodeBase> arg, int precedence = 4);
 
     int evaluate() const override;
 
     std::string toString() const override;
+
+    std::unique_ptr<NodeBase> clone() const override;
 };
 
 class NodeAdd : public BinaryNodeBase {
 public:
-    NodeAdd(std::unique_ptr<NodeBase> left = nullptr, std::unique_ptr<NodeBase> right = nullptr, int precedence = 1);
+    NodeAdd(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence = 1);
 
     int evaluate() const override;
 
     std::string toString() const override;
+
+    std::unique_ptr<NodeBase> clone() const override;
 };
 
 class NodeSubtract : public BinaryNodeBase {
 public:
-    NodeSubtract(std::unique_ptr<NodeBase> left = nullptr, std::unique_ptr<NodeBase> right = nullptr, int precedence = 1);
+    NodeSubtract(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence = 1);
 
     int evaluate() const override;
 
     std::string toString() const override;
+
+    std::unique_ptr<NodeBase> clone() const override;
 };
 
 class NodeMultiply : public BinaryNodeBase {
 public:
-    NodeMultiply(std::unique_ptr<NodeBase> left = nullptr, std::unique_ptr<NodeBase> right = nullptr, int precedence = 2);
+    NodeMultiply(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence = 2);
 
     int evaluate() const override;
 
     std::string toString() const override;
+
+    std::unique_ptr<NodeBase> clone() const override;
 };
 
 class NodeDivide : public BinaryNodeBase {
 public:
-    NodeDivide(std::unique_ptr<NodeBase> left = nullptr, std::unique_ptr<NodeBase> right = nullptr, int precedence = 2);
+    NodeDivide(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence = 2);
 
     int evaluate() const override;
 
     std::string toString() const override;
+
+    std::unique_ptr<NodeBase> clone() const override;
 };
 
 class NodeExponent : public BinaryNodeBase {
 public:
-    NodeExponent(std::unique_ptr<NodeBase> left = nullptr, std::unique_ptr<NodeBase> right = nullptr, int precedence = 3);
+    NodeExponent(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence = 3);
 
     int evaluate() const override;
 
     std::string toString() const override;
+
+    std::unique_ptr<NodeBase> clone() const override;
 };

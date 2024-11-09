@@ -26,6 +26,7 @@ int main(int argc, char** argv) {
         if (! tokens.empty()) {
             unique_ptr<NodeBase> node = buildTree(tokens);
             cout << "= " << node->evaluate() << endl;
+            cout << node->clone()->toString() << endl;
         }
 
         cout << "Enter an expression (q to quit):" << endl;
