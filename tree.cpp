@@ -3,11 +3,20 @@
 #include <iostream>
 #include <cmath>
 
+const int valPrecedence = 5; // NodeVal, NodeVar
+const int unaryPrecedence = 4; // functions, NodeAddInverse
+const int exponentPrecedence = 3; // NodeExponent
+const int multiplyPrecendence = 2; // NodeMultiply, NodeDivide
+const int addPrecedence = 1; // NodeAdd, NodeSubtract
+
 using std::string;
 using std::unique_ptr;
 
-NodeBase::NodeBase(int precedence)
-    : precedence(precedence) {
+NodeBase::NodeBase(int precedence) : precedence(precedence) {
+}
+
+int NodeBase::getPrecedence() const {
+    return precedence;
 }
 
 UnaryNodeBase::UnaryNodeBase(unique_ptr<NodeBase> arg, int precedence)
@@ -18,8 +27,8 @@ BinaryNodeBase::BinaryNodeBase(unique_ptr<NodeBase> left, unique_ptr<NodeBase> r
     : NodeBase(precedence), left(std::move(left)), right(std::move(right)) {
 }
 
-NodeVal::NodeVal(int val, int precedence) 
-    : NodeBase(precedence), val(val) {
+NodeVal::NodeVal(int val)
+    : NodeBase(valPrecedence), val(val) {
 }
 
 int NodeVal::evaluate() const {
@@ -34,8 +43,8 @@ unique_ptr<NodeBase> NodeVal::clone() const {
     return std::make_unique<NodeVal>(*this);
 }
 
-NodeVar::NodeVar(char symbol, int precedence)
-    : NodeBase(precedence), symbol(symbol) {
+NodeVar::NodeVar(char symbol)
+    : NodeBase(valPrecedence), symbol(symbol) {
 }
 
 int NodeVar::evaluate() const {
@@ -50,8 +59,8 @@ unique_ptr<NodeBase> NodeVar::clone() const {
     return std::make_unique<NodeVar>(*this);
 }
 
-NodeAddInverse::NodeAddInverse(unique_ptr<NodeBase> arg, int precedence)
-    : UnaryNodeBase(std::move(arg), precedence) {
+NodeAddInverse::NodeAddInverse(unique_ptr<NodeBase> arg)
+    : UnaryNodeBase(std::move(arg), unaryPrecedence) {
 }
 
 int NodeAddInverse::evaluate() const {
@@ -59,7 +68,7 @@ int NodeAddInverse::evaluate() const {
 }
 
 string NodeAddInverse::toString() const {
-    if (precedence > arg->precedence) {
+    if (precedence > arg->getPrecedence()) {
         return "-(" + arg->toString() + ")";
     } else {
         return "-" + arg->toString();
@@ -70,8 +79,8 @@ unique_ptr<NodeBase> NodeAddInverse::clone() const {
     return std::make_unique<NodeAddInverse>(arg->clone());
 }
 
-NodeSin::NodeSin(unique_ptr<NodeBase> arg, int precedence)
-    : UnaryNodeBase(std::move(arg), precedence) {
+NodeSin::NodeSin(unique_ptr<NodeBase> arg)
+    : UnaryNodeBase(std::move(arg), unaryPrecedence) {
 }
 
 int NodeSin::evaluate() const {
@@ -86,8 +95,8 @@ unique_ptr<NodeBase> NodeSin::clone() const {
     return std::make_unique<NodeSin>(arg->clone());
 }
 
-NodeCos::NodeCos(unique_ptr<NodeBase> arg, int precedence)
-    : UnaryNodeBase(std::move(arg), precedence) {
+NodeCos::NodeCos(unique_ptr<NodeBase> arg)
+    : UnaryNodeBase(std::move(arg), unaryPrecedence) {
 }
 
 int NodeCos::evaluate() const {
@@ -102,8 +111,8 @@ unique_ptr<NodeBase> NodeCos::clone() const {
     return std::make_unique<NodeCos>(arg->clone());
 }
 
-NodeExp::NodeExp(unique_ptr<NodeBase> arg, int precedence)
-    : UnaryNodeBase(std::move(arg), precedence) {
+NodeExp::NodeExp(unique_ptr<NodeBase> arg)
+    : UnaryNodeBase(std::move(arg), unaryPrecedence) {
 }
 
 int NodeExp::evaluate() const {
@@ -118,8 +127,8 @@ unique_ptr<NodeBase> NodeExp::clone() const {
     return std::make_unique<NodeExp>(arg->clone());
 }
 
-NodeLog::NodeLog(unique_ptr<NodeBase> arg, int precedence)
-    : UnaryNodeBase(std::move(arg), precedence) {
+NodeLog::NodeLog(unique_ptr<NodeBase> arg)
+    : UnaryNodeBase(std::move(arg), unaryPrecedence) {
 }
 
 int NodeLog::evaluate() const {
@@ -134,8 +143,8 @@ unique_ptr<NodeBase> NodeLog::clone() const {
     return std::make_unique<NodeLog>(arg->clone());
 }
 
-NodeAdd::NodeAdd(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right, int precedence)
-    : BinaryNodeBase(std::move(left), std::move(right), precedence) {
+NodeAdd::NodeAdd(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
+    : BinaryNodeBase(std::move(left), std::move(right), addPrecedence) {
 }
 
 int NodeAdd::evaluate() const {
@@ -146,13 +155,13 @@ string NodeAdd::toString() const {
     string leftString;
     string rightString;
 
-    if (left->precedence < precedence) {
+    if (left->getPrecedence() < precedence) {
         leftString = "(" + left->toString() + ")";
     } else {
         leftString = left->toString();
     }
 
-    if (right->precedence < precedence) {
+    if (right->getPrecedence() < precedence) {
         rightString = "(" + right->toString() + ")";
     } else {
         rightString = right->toString();
@@ -165,8 +174,8 @@ unique_ptr<NodeBase> NodeAdd::clone() const {
     return std::make_unique<NodeAdd>(left->clone(), right->clone());
 }
 
-NodeSubtract::NodeSubtract(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right, int precedence)
-    : BinaryNodeBase(std::move(left), std::move(right), precedence) {
+NodeSubtract::NodeSubtract(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
+    : BinaryNodeBase(std::move(left), std::move(right), addPrecedence) {
 }
 
 int NodeSubtract::evaluate() const {
@@ -177,13 +186,13 @@ string NodeSubtract::toString() const {
     string leftString;
     string rightString;
 
-    if (left->precedence < precedence) {
+    if (left->getPrecedence() < precedence) {
         leftString = "(" + left->toString() + ")";
     } else {
         leftString = left->toString();
     }
 
-    if (right->precedence < precedence) {
+    if (right->getPrecedence() < precedence) {
         rightString = "(" + right->toString() + ")";
     } else {
         rightString = right->toString();
@@ -196,8 +205,8 @@ unique_ptr<NodeBase> NodeSubtract::clone() const {
     return std::make_unique<NodeSubtract>(left->clone(), right->clone());
 }
 
-NodeMultiply::NodeMultiply(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right, int precedence)
-    : BinaryNodeBase(std::move(left), std::move(right), precedence) {
+NodeMultiply::NodeMultiply(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
+    : BinaryNodeBase(std::move(left), std::move(right), multiplyPrecendence) {
 }
 
 int NodeMultiply::evaluate() const {
@@ -208,13 +217,13 @@ string NodeMultiply::toString() const {
     string leftString;
     string rightString;
 
-    if (left->precedence < precedence) {
+    if (left->getPrecedence() < precedence) {
         leftString = "(" + left->toString() + ")";
     } else {
         leftString = left->toString();
     }
 
-    if (right->precedence < precedence) {
+    if (right->getPrecedence() < precedence) {
         rightString = "(" + right->toString() + ")";
     } else {
         rightString = right->toString();
@@ -227,8 +236,8 @@ unique_ptr<NodeBase> NodeMultiply::clone() const {
     return std::make_unique<NodeMultiply>(left->clone(), right->clone());
 }
 
-NodeDivide::NodeDivide(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right, int precedence)
-    : BinaryNodeBase(std::move(left), std::move(right), precedence) {
+NodeDivide::NodeDivide(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
+    : BinaryNodeBase(std::move(left), std::move(right), multiplyPrecendence) {
 }
 
 int NodeDivide::evaluate() const {
@@ -239,13 +248,13 @@ string NodeDivide::toString() const {
     string leftString;
     string rightString;
 
-    if (left->precedence < precedence) {
+    if (left->getPrecedence() < precedence) {
         leftString = "(" + left->toString() + ")";
     } else {
         leftString = left->toString();
     }
 
-    if (right->precedence < precedence) {
+    if (right->getPrecedence() < precedence) {
         rightString = "(" + right->toString() + ")";
     } else {
         rightString = right->toString();
@@ -258,8 +267,8 @@ unique_ptr<NodeBase> NodeDivide::clone() const {
     return std::make_unique<NodeDivide>(left->clone(), right->clone());
 }
 
-NodeExponent::NodeExponent(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right, int precedence)
-    : BinaryNodeBase(std::move(left), std::move(right), precedence) {
+NodeExponent::NodeExponent(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
+    : BinaryNodeBase(std::move(left), std::move(right), exponentPrecedence) {
 }
 
 int NodeExponent::evaluate() const {
@@ -270,13 +279,13 @@ string NodeExponent::toString() const {
     string leftString;
     string rightString;
 
-    if (left->precedence < precedence) {
+    if (left->getPrecedence() < precedence) {
         leftString = "(" + left->toString() + ")";
     } else {
         leftString = left->toString();
     }
 
-    if (right->precedence <= precedence) {
+    if (right->getPrecedence() <= precedence) {
         rightString = "(" + right->toString() + ")";
     } else {
         rightString = right->toString();

@@ -24,13 +24,15 @@ public:
 
     virtual std::unique_ptr<NodeBase> clone() const = 0;
 
-public:
+    int getPrecedence() const;
+
+protected:
     const int precedence;
 };
 
 class UnaryNodeBase : public NodeBase {
 public:
-    UnaryNodeBase(std::unique_ptr<NodeBase> arg, int precedence = 0);
+    UnaryNodeBase(std::unique_ptr<NodeBase> arg, int precedence);
     virtual ~UnaryNodeBase() = default;
 
     virtual int evaluate() const = 0;
@@ -41,7 +43,7 @@ protected:
 
 class BinaryNodeBase : public NodeBase {
 public:
-    BinaryNodeBase(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence = 0);
+    BinaryNodeBase(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence);
     virtual ~BinaryNodeBase() = default;
 
     virtual int evaluate() const = 0;
@@ -53,7 +55,7 @@ protected:
 
 class NodeVal : public NodeBase {
 public:
-    NodeVal(int val, int precedence = 5);
+    NodeVal(int val);
 
     int evaluate() const override;
 
@@ -67,7 +69,7 @@ public:
 
 class NodeVar : public NodeBase {
 public:
-    NodeVar(char symbol, int precedence = 5);
+    NodeVar(char symbol);
 
     int evaluate() const override;
 
@@ -81,7 +83,7 @@ public:
 
 class NodeAddInverse : public UnaryNodeBase {
 public:
-    NodeAddInverse(std::unique_ptr<NodeBase> arg, int precedence = 4);
+    NodeAddInverse(std::unique_ptr<NodeBase> arg);
 
     int evaluate() const override;
 
@@ -92,7 +94,7 @@ public:
 
 class NodeSin : public UnaryNodeBase {
 public:
-    NodeSin(std::unique_ptr<NodeBase> arg, int precedence = 4);
+    NodeSin(std::unique_ptr<NodeBase> arg);
 
     int evaluate() const override;
 
@@ -103,7 +105,7 @@ public:
 
 class NodeCos : public UnaryNodeBase {
 public:
-    NodeCos(std::unique_ptr<NodeBase> arg, int precedence = 4);
+    NodeCos(std::unique_ptr<NodeBase> arg);
 
     int evaluate() const override;
 
@@ -114,7 +116,7 @@ public:
 
 class NodeExp : public UnaryNodeBase {
 public:
-    NodeExp(std::unique_ptr<NodeBase> arg, int precedence = 4);
+    NodeExp(std::unique_ptr<NodeBase> arg);
 
     int evaluate() const override;
 
@@ -125,7 +127,7 @@ public:
 
 class NodeLog : public UnaryNodeBase {
 public:
-    NodeLog(std::unique_ptr<NodeBase> arg, int precedence = 4);
+    NodeLog(std::unique_ptr<NodeBase> arg);
 
     int evaluate() const override;
 
@@ -136,7 +138,7 @@ public:
 
 class NodeAdd : public BinaryNodeBase {
 public:
-    NodeAdd(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence = 1);
+    NodeAdd(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right);
 
     int evaluate() const override;
 
@@ -147,7 +149,7 @@ public:
 
 class NodeSubtract : public BinaryNodeBase {
 public:
-    NodeSubtract(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence = 1);
+    NodeSubtract(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right);
 
     int evaluate() const override;
 
@@ -158,7 +160,7 @@ public:
 
 class NodeMultiply : public BinaryNodeBase {
 public:
-    NodeMultiply(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence = 2);
+    NodeMultiply(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right);
 
     int evaluate() const override;
 
@@ -169,7 +171,7 @@ public:
 
 class NodeDivide : public BinaryNodeBase {
 public:
-    NodeDivide(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence = 2);
+    NodeDivide(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right);
 
     int evaluate() const override;
 
@@ -180,7 +182,7 @@ public:
 
 class NodeExponent : public BinaryNodeBase {
 public:
-    NodeExponent(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence = 3);
+    NodeExponent(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right);
 
     int evaluate() const override;
 
