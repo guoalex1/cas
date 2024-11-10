@@ -11,6 +11,7 @@ const int addPrecedence = 1; // NodeAdd, NodeSubtract
 
 using std::string;
 using std::unique_ptr;
+using std::make_unique;
 
 NodeBase::NodeBase(int precedence) : precedence(precedence) {
 }
@@ -39,11 +40,11 @@ string NodeVal::toString() const {
 }
 
 unique_ptr<NodeBase> NodeVal::clone() const {
-    return std::make_unique<NodeVal>(*this);
+    return make_unique<NodeVal>(*this);
 }
 
 unique_ptr<NodeBase> NodeVal::differentiate(char wrt) const {
-    return std::make_unique<NodeVal>(0);
+    return make_unique<NodeVal>(0);
 }
 
 NodeVar::NodeVar(char symbol)
@@ -59,11 +60,11 @@ string NodeVar::toString() const {
 }
 
 unique_ptr<NodeBase> NodeVar::clone() const {
-    return std::make_unique<NodeVar>(*this);
+    return make_unique<NodeVar>(*this);
 }
 
 unique_ptr<NodeBase> NodeVar::differentiate(char wrt) const {
-    return symbol == wrt ? std::make_unique<NodeVal>(1) : std::make_unique<NodeVal>(0);
+    return symbol == wrt ? make_unique<NodeVal>(1) : make_unique<NodeVal>(0);
 }
 
 NodeAddInverse::NodeAddInverse(unique_ptr<NodeBase> arg)
@@ -83,11 +84,11 @@ string NodeAddInverse::toString() const {
 }
 
 unique_ptr<NodeBase> NodeAddInverse::clone() const {
-    return std::make_unique<NodeAddInverse>(arg->clone());
+    return make_unique<NodeAddInverse>(arg->clone());
 }
 
 unique_ptr<NodeBase> NodeAddInverse::differentiate(char wrt) const {
-    return std::make_unique<NodeAddInverse>(arg->differentiate(wrt));
+    return make_unique<NodeAddInverse>(arg->differentiate(wrt));
 }
 
 NodeSin::NodeSin(unique_ptr<NodeBase> arg)
@@ -103,11 +104,11 @@ string NodeSin::toString() const {
 }
 
 unique_ptr<NodeBase> NodeSin::clone() const {
-    return std::make_unique<NodeSin>(arg->clone());
+    return make_unique<NodeSin>(arg->clone());
 }
 
 unique_ptr<NodeBase> NodeSin::differentiate(char wrt) const {
-    return std::make_unique<NodeMultiply>(arg->differentiate(wrt), std::make_unique<NodeCos>(arg->clone()));
+    return make_unique<NodeMultiply>(arg->differentiate(wrt), make_unique<NodeCos>(arg->clone()));
 }
 
 NodeCos::NodeCos(unique_ptr<NodeBase> arg)
@@ -123,12 +124,12 @@ string NodeCos::toString() const {
 }
 
 unique_ptr<NodeBase> NodeCos::clone() const {
-    return std::make_unique<NodeCos>(arg->clone());
+    return make_unique<NodeCos>(arg->clone());
 }
 
 unique_ptr<NodeBase> NodeCos::differentiate(char wrt) const {
-    return std::make_unique<NodeMultiply>
-           (std::make_unique<NodeAddInverse>(arg->differentiate(wrt)), std::make_unique<NodeSin>(arg->clone()));
+    return make_unique<NodeMultiply>
+           (make_unique<NodeAddInverse>(arg->differentiate(wrt)), make_unique<NodeSin>(arg->clone()));
 }
 
 NodeExp::NodeExp(unique_ptr<NodeBase> arg)
@@ -144,11 +145,11 @@ string NodeExp::toString() const {
 }
 
 unique_ptr<NodeBase> NodeExp::clone() const {
-    return std::make_unique<NodeExp>(arg->clone());
+    return make_unique<NodeExp>(arg->clone());
 }
 
 unique_ptr<NodeBase> NodeExp::differentiate(char wrt) const {
-    return std::make_unique<NodeMultiply>(arg->differentiate(wrt), std::make_unique<NodeExp>(arg->clone()));
+    return make_unique<NodeMultiply>(arg->differentiate(wrt), make_unique<NodeExp>(arg->clone()));
 }
 
 NodeLog::NodeLog(unique_ptr<NodeBase> arg)
@@ -164,11 +165,11 @@ string NodeLog::toString() const {
 }
 
 unique_ptr<NodeBase> NodeLog::clone() const {
-    return std::make_unique<NodeLog>(arg->clone());
+    return make_unique<NodeLog>(arg->clone());
 }
 
 unique_ptr<NodeBase> NodeLog::differentiate(char wrt) const {
-    return std::make_unique<NodeDivide>(arg->differentiate(wrt), arg->clone());
+    return make_unique<NodeDivide>(arg->differentiate(wrt), arg->clone());
 }
 
 NodeAdd::NodeAdd(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
@@ -199,11 +200,11 @@ string NodeAdd::toString() const {
 }
 
 unique_ptr<NodeBase> NodeAdd::clone() const {
-    return std::make_unique<NodeAdd>(left->clone(), right->clone());
+    return make_unique<NodeAdd>(left->clone(), right->clone());
 }
 
 unique_ptr<NodeBase> NodeAdd::differentiate(char wrt) const {
-    return std::make_unique<NodeAdd>(left->differentiate(wrt), right->differentiate(wrt));
+    return make_unique<NodeAdd>(left->differentiate(wrt), right->differentiate(wrt));
 }
 
 NodeSubtract::NodeSubtract(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
@@ -234,11 +235,11 @@ string NodeSubtract::toString() const {
 }
 
 unique_ptr<NodeBase> NodeSubtract::clone() const {
-    return std::make_unique<NodeSubtract>(left->clone(), right->clone());
+    return make_unique<NodeSubtract>(left->clone(), right->clone());
 }
 
 unique_ptr<NodeBase> NodeSubtract::differentiate(char wrt) const {
-    return std::make_unique<NodeSubtract>(left->differentiate(wrt), right->differentiate(wrt));
+    return make_unique<NodeSubtract>(left->differentiate(wrt), right->differentiate(wrt));
 }
 
 NodeMultiply::NodeMultiply(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
@@ -269,12 +270,12 @@ string NodeMultiply::toString() const {
 }
 
 unique_ptr<NodeBase> NodeMultiply::clone() const {
-    return std::make_unique<NodeMultiply>(left->clone(), right->clone());
+    return make_unique<NodeMultiply>(left->clone(), right->clone());
 }
 
 unique_ptr<NodeBase> NodeMultiply::differentiate(char wrt) const {
-    return std::make_unique<NodeAdd>(std::make_unique<NodeMultiply>(left->differentiate(wrt), right->clone()),
-                                     std::make_unique<NodeMultiply>(right->differentiate(wrt), left->clone()));
+    return make_unique<NodeAdd>(make_unique<NodeMultiply>(left->differentiate(wrt), right->clone()),
+                                     make_unique<NodeMultiply>(right->differentiate(wrt), left->clone()));
 }
 
 NodeDivide::NodeDivide(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
@@ -305,14 +306,14 @@ string NodeDivide::toString() const {
 }
 
 unique_ptr<NodeBase> NodeDivide::clone() const {
-    return std::make_unique<NodeDivide>(left->clone(), right->clone());
+    return make_unique<NodeDivide>(left->clone(), right->clone());
 }
 
 unique_ptr<NodeBase> NodeDivide::differentiate(char wrt) const {
-    return std::make_unique<NodeDivide>(std::make_unique<NodeSubtract>(
-        std::make_unique<NodeMultiply>(left->differentiate(wrt), right->clone()),
-        std::make_unique<NodeMultiply>(right->differentiate(wrt), left->clone())),
-        std::make_unique<NodeExponent>(right->clone(), std::make_unique<NodeVal>(2)));
+    return make_unique<NodeDivide>(make_unique<NodeSubtract>(
+        make_unique<NodeMultiply>(left->differentiate(wrt), right->clone()),
+        make_unique<NodeMultiply>(right->differentiate(wrt), left->clone())),
+        make_unique<NodeExponent>(right->clone(), make_unique<NodeVal>(2)));
 }
 
 NodeExponent::NodeExponent(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
@@ -343,9 +344,9 @@ string NodeExponent::toString() const {
 }
 
 unique_ptr<NodeBase> NodeExponent::clone() const {
-    return std::make_unique<NodeExponent>(left->clone(), right->clone());
+    return make_unique<NodeExponent>(left->clone(), right->clone());
 }
 
 unique_ptr<NodeBase> NodeExponent::differentiate(char wrt) const {
-    return std::make_unique<NodeVal>(1); // TODO
+    return make_unique<NodeVal>(1); // TODO
 }
