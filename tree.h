@@ -22,6 +22,8 @@ public:
 
     virtual std::string toString() const = 0;
 
+    virtual std::unique_ptr<NodeBase> differentiate(char wrt) const = 0;
+
     virtual std::unique_ptr<NodeBase> clone() const = 0;
 
     int getPrecedence() const;
@@ -61,6 +63,8 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
+
     std::unique_ptr<NodeBase> clone() const override;
 
 public:
@@ -74,6 +78,8 @@ public:
     int evaluate() const override;
 
     std::string toString() const override;
+
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
 
     std::unique_ptr<NodeBase> clone() const override;
 
@@ -89,6 +95,8 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
+
     std::unique_ptr<NodeBase> clone() const override;
 };
 
@@ -99,6 +107,8 @@ public:
     int evaluate() const override;
 
     std::string toString() const override;
+
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
 
     std::unique_ptr<NodeBase> clone() const override;
 };
@@ -111,6 +121,8 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
+    
     std::unique_ptr<NodeBase> clone() const override;
 };
 
@@ -122,6 +134,8 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
+    
     std::unique_ptr<NodeBase> clone() const override;
 };
 
@@ -133,6 +147,8 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
+    
     std::unique_ptr<NodeBase> clone() const override;
 };
 
@@ -144,6 +160,8 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
+    
     std::unique_ptr<NodeBase> clone() const override;
 };
 
@@ -155,6 +173,8 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
+    
     std::unique_ptr<NodeBase> clone() const override;
 };
 
@@ -165,6 +185,8 @@ public:
     int evaluate() const override;
 
     std::string toString() const override;
+
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
 
     std::unique_ptr<NodeBase> clone() const override;
 };
@@ -177,6 +199,8 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
+
     std::unique_ptr<NodeBase> clone() const override;
 };
 
@@ -187,6 +211,8 @@ public:
     int evaluate() const override;
 
     std::string toString() const override;
+
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
 
     std::unique_ptr<NodeBase> clone() const override;
 };
