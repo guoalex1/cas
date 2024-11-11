@@ -275,7 +275,7 @@ unique_ptr<NodeBase> NodeMultiply::clone() const {
 
 unique_ptr<NodeBase> NodeMultiply::differentiate(char wrt) const {
     return make_unique<NodeAdd>(make_unique<NodeMultiply>(left->differentiate(wrt), right->clone()),
-                                     make_unique<NodeMultiply>(right->differentiate(wrt), left->clone()));
+                                make_unique<NodeMultiply>(left->clone(), right->differentiate(wrt)));
 }
 
 NodeDivide::NodeDivide(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
@@ -348,5 +348,7 @@ unique_ptr<NodeBase> NodeExponent::clone() const {
 }
 
 unique_ptr<NodeBase> NodeExponent::differentiate(char wrt) const {
-    return make_unique<NodeVal>(1); // TODO
+    return make_unique<NodeMultiply>(make_unique<NodeVal>(right->evaluate()),
+                                     make_unique<NodeExponent>(make_unique<NodeVar>(wrt),
+                                                               make_unique<NodeVal>(right->evaluate() - 1)));
 }
