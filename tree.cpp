@@ -173,7 +173,15 @@ unique_ptr<NodeBase> NodeExp::differentiate(char wrt) const {
 }
 
 unique_ptr<NodeBase> NodeExp::simplify() const {
-    return make_unique<NodeExp>(arg->simplify());
+    unique_ptr<NodeBase> argSimple = arg->simplify();
+
+    NodeVal* leftVal = dynamic_cast<NodeVal*>(argSimple.get());
+
+    if (leftVal != nullptr && argSimple->evaluate() == 0) {
+        return make_unique<NodeVal>(1);
+    } else {
+        return make_unique<NodeExp>(std::move(argSimple));
+    }
 }
 
 NodeLog::NodeLog(unique_ptr<NodeBase> arg)
@@ -197,7 +205,15 @@ unique_ptr<NodeBase> NodeLog::differentiate(char wrt) const {
 }
 
 unique_ptr<NodeBase> NodeLog::simplify() const {
-    return make_unique<NodeLog>(arg->simplify());
+    unique_ptr<NodeBase> argSimple = arg->simplify();
+
+    NodeVal* leftVal = dynamic_cast<NodeVal*>(argSimple.get());
+
+    if (leftVal != nullptr && argSimple->evaluate() == 1) {
+        return make_unique<NodeVal>(0);
+    } else {
+        return make_unique<NodeLog>(std::move(argSimple));
+    }
 }
 
 NodeAdd::NodeAdd(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
