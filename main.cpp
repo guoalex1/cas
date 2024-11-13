@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
             if (mode == Mode::EVAL) {
                 cout << "= " << node->evaluate() << endl;
             } else if (mode == Mode::DIFF) {
-                cout << "d/d" << wrt << "(" << expression << ") = " << node->differentiate(wrt)->toString() << endl;
+                cout << "d/d" << wrt << "(" << expression << ") = " << node->differentiate(wrt)->simplify()->toString() << endl;
             }
         }
 

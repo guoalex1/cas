@@ -6,7 +6,7 @@
 const int valPrecedence = 5; // NodeVal, NodeVar
 const int unaryPrecedence = 4; // functions, NodeAddInverse
 const int exponentPrecedence = 3; // NodeExponent
-const int multiplyPrecendence = 2; // NodeMultiply, NodeDivide
+const int multiplyPrecedence = 2; // NodeMultiply, NodeDivide
 const int addPrecedence = 1; // NodeAdd, NodeSubtract
 
 using std::string;
@@ -47,6 +47,10 @@ unique_ptr<NodeBase> NodeVal::differentiate(char wrt) const {
     return make_unique<NodeVal>(0);
 }
 
+unique_ptr<NodeBase> NodeVal::simplify() const {
+    return make_unique<NodeVal>(val);
+}
+
 NodeVar::NodeVar(char symbol)
     : NodeBase(valPrecedence), symbol(symbol) {
 }
@@ -65,6 +69,10 @@ unique_ptr<NodeBase> NodeVar::clone() const {
 
 unique_ptr<NodeBase> NodeVar::differentiate(char wrt) const {
     return symbol == wrt ? make_unique<NodeVal>(1) : make_unique<NodeVal>(0);
+}
+
+unique_ptr<NodeBase> NodeVar::simplify() const {
+    return make_unique<NodeVar>(symbol);
 }
 
 NodeAddInverse::NodeAddInverse(unique_ptr<NodeBase> arg)
@@ -91,6 +99,10 @@ unique_ptr<NodeBase> NodeAddInverse::differentiate(char wrt) const {
     return make_unique<NodeAddInverse>(arg->differentiate(wrt));
 }
 
+unique_ptr<NodeBase> NodeAddInverse::simplify() const {
+    return make_unique<NodeAddInverse>(arg->simplify());
+}
+
 NodeSin::NodeSin(unique_ptr<NodeBase> arg)
     : UnaryNodeBase(std::move(arg), unaryPrecedence) {
 }
@@ -109,6 +121,10 @@ unique_ptr<NodeBase> NodeSin::clone() const {
 
 unique_ptr<NodeBase> NodeSin::differentiate(char wrt) const {
     return make_unique<NodeMultiply>(arg->differentiate(wrt), make_unique<NodeCos>(arg->clone()));
+}
+
+unique_ptr<NodeBase> NodeSin::simplify() const {
+    return make_unique<NodeSin>(arg->simplify());
 }
 
 NodeCos::NodeCos(unique_ptr<NodeBase> arg)
@@ -132,6 +148,10 @@ unique_ptr<NodeBase> NodeCos::differentiate(char wrt) const {
            (make_unique<NodeAddInverse>(arg->differentiate(wrt)), make_unique<NodeSin>(arg->clone()));
 }
 
+unique_ptr<NodeBase> NodeCos::simplify() const {
+    return make_unique<NodeCos>(arg->simplify());
+}
+
 NodeExp::NodeExp(unique_ptr<NodeBase> arg)
     : UnaryNodeBase(std::move(arg), unaryPrecedence) {
 }
@@ -152,6 +172,10 @@ unique_ptr<NodeBase> NodeExp::differentiate(char wrt) const {
     return make_unique<NodeMultiply>(arg->differentiate(wrt), make_unique<NodeExp>(arg->clone()));
 }
 
+unique_ptr<NodeBase> NodeExp::simplify() const {
+    return make_unique<NodeExp>(arg->simplify());
+}
+
 NodeLog::NodeLog(unique_ptr<NodeBase> arg)
     : UnaryNodeBase(std::move(arg), unaryPrecedence) {
 }
@@ -170,6 +194,10 @@ unique_ptr<NodeBase> NodeLog::clone() const {
 
 unique_ptr<NodeBase> NodeLog::differentiate(char wrt) const {
     return make_unique<NodeDivide>(arg->differentiate(wrt), arg->clone());
+}
+
+unique_ptr<NodeBase> NodeLog::simplify() const {
+    return make_unique<NodeLog>(arg->simplify());
 }
 
 NodeAdd::NodeAdd(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
@@ -207,6 +235,25 @@ unique_ptr<NodeBase> NodeAdd::differentiate(char wrt) const {
     return make_unique<NodeAdd>(left->differentiate(wrt), right->differentiate(wrt));
 }
 
+unique_ptr<NodeBase> NodeAdd::simplify() const {
+    unique_ptr<NodeBase> leftSimple = left->simplify();
+    unique_ptr<NodeBase> rightSimple = right->simplify();
+
+    NodeBase* leftVal = dynamic_cast<NodeVal*>(leftSimple.get());
+    NodeBase* rightVal = dynamic_cast<NodeVal*>(rightSimple.get());
+
+    // check for special simplification rules
+    if (leftVal != nullptr && rightVal != nullptr) {
+        return make_unique<NodeVal>(leftVal->evaluate() + rightVal->evaluate());
+    } else if (leftVal != nullptr && leftVal->evaluate() == 0) {
+        return rightSimple;
+    } else if (rightVal != nullptr && rightVal->evaluate() == 0) {
+        return leftSimple;
+    } else {
+        return make_unique<NodeAdd>(std::move(leftSimple), std::move(rightSimple));
+    }
+}
+
 NodeSubtract::NodeSubtract(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
     : BinaryNodeBase(std::move(left), std::move(right), addPrecedence) {
 }
@@ -242,8 +289,27 @@ unique_ptr<NodeBase> NodeSubtract::differentiate(char wrt) const {
     return make_unique<NodeSubtract>(left->differentiate(wrt), right->differentiate(wrt));
 }
 
+unique_ptr<NodeBase> NodeSubtract::simplify() const {
+    unique_ptr<NodeBase> leftSimple = left->simplify();
+    unique_ptr<NodeBase> rightSimple = right->simplify();
+
+    NodeBase* leftVal = dynamic_cast<NodeVal*>(leftSimple.get());
+    NodeBase* rightVal = dynamic_cast<NodeVal*>(rightSimple.get());
+
+    // check for special simplification rules
+    if (leftVal != nullptr && rightVal != nullptr) {
+        return make_unique<NodeVal>(leftVal->evaluate() - rightVal->evaluate());
+    } else if (leftVal != nullptr && leftVal->evaluate() == 0) {
+        return make_unique<NodeAddInverse>(std::move(rightSimple));
+    } else if (rightVal != nullptr && rightVal->evaluate() == 0) {
+        return leftSimple;
+    } else {
+        return make_unique<NodeSubtract>(std::move(leftSimple), std::move(rightSimple));
+    }
+}
+
 NodeMultiply::NodeMultiply(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
-    : BinaryNodeBase(std::move(left), std::move(right), multiplyPrecendence) {
+    : BinaryNodeBase(std::move(left), std::move(right), multiplyPrecedence) {
 }
 
 int NodeMultiply::evaluate() const {
@@ -278,8 +344,35 @@ unique_ptr<NodeBase> NodeMultiply::differentiate(char wrt) const {
                                 make_unique<NodeMultiply>(left->clone(), right->differentiate(wrt)));
 }
 
+unique_ptr<NodeBase> NodeMultiply::simplify() const {
+    unique_ptr<NodeBase> leftSimple = left->simplify();
+    unique_ptr<NodeBase> rightSimple = right->simplify();
+
+    // check for special simplification rules
+    NodeBase* leftVal = dynamic_cast<NodeVal*>(leftSimple.get());
+    NodeBase* rightVal = dynamic_cast<NodeVal*>(rightSimple.get());
+
+    if (leftVal != nullptr && rightVal != nullptr) {
+        return make_unique<NodeVal>(leftVal->evaluate() * rightVal->evaluate());
+    } else if (leftVal != nullptr && leftVal->evaluate() == 1) {
+        return rightSimple;
+    } else if (leftVal != nullptr && leftVal->evaluate() == -1) {
+        return make_unique<NodeAddInverse>(std::move(rightSimple));
+    } else if (leftVal != nullptr && leftVal->evaluate() == 0) {
+        return make_unique<NodeVal>(0);
+    } else if (rightVal != nullptr && rightVal->evaluate() == 1) {
+        return leftSimple;
+    } else if (rightVal != nullptr && rightVal->evaluate() == -1) {
+        return make_unique<NodeAddInverse>(std::move(leftSimple));
+    } else if (rightVal != nullptr && rightVal->evaluate() == 0) {
+        return make_unique<NodeVal>(0);
+    } else {
+        return make_unique<NodeMultiply>(std::move(leftSimple), std::move(rightSimple));
+    }
+}
+
 NodeDivide::NodeDivide(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
-    : BinaryNodeBase(std::move(left), std::move(right), multiplyPrecendence) {
+    : BinaryNodeBase(std::move(left), std::move(right), multiplyPrecedence) {
 }
 
 int NodeDivide::evaluate() const {
@@ -316,6 +409,27 @@ unique_ptr<NodeBase> NodeDivide::differentiate(char wrt) const {
         make_unique<NodeExponent>(right->clone(), make_unique<NodeVal>(2)));
 }
 
+unique_ptr<NodeBase> NodeDivide::simplify() const {
+    unique_ptr<NodeBase> leftSimple = left->simplify();
+    unique_ptr<NodeBase> rightSimple = right->simplify();
+
+    NodeBase* leftVal = dynamic_cast<NodeVal*>(leftSimple.get());
+    NodeBase* rightVal = dynamic_cast<NodeVal*>(rightSimple.get());
+
+    // check for special simplification rules
+    if (leftVal != nullptr && rightVal != nullptr) {
+        return make_unique<NodeVal>(leftVal->evaluate() * rightVal->evaluate());
+    } else if (leftVal != nullptr && leftVal->evaluate() == 0) {
+        return make_unique<NodeVal>(0);
+    } else if (rightVal != nullptr && rightVal->evaluate() == 1) {
+        return leftSimple;
+    } else if (rightVal != nullptr && rightVal->evaluate() == -1) {
+        return make_unique<NodeAddInverse>(std::move(leftSimple));
+    } else {
+        return make_unique<NodeDivide>(std::move(leftSimple), std::move(rightSimple));;
+    }
+}
+
 NodeExponent::NodeExponent(unique_ptr<NodeBase> left, unique_ptr<NodeBase> right)
     : BinaryNodeBase(std::move(left), std::move(right), exponentPrecedence) {
 }
@@ -347,8 +461,33 @@ unique_ptr<NodeBase> NodeExponent::clone() const {
     return make_unique<NodeExponent>(left->clone(), right->clone());
 }
 
+// power rule
 unique_ptr<NodeBase> NodeExponent::differentiate(char wrt) const {
-    return make_unique<NodeMultiply>(make_unique<NodeVal>(right->evaluate()),
-                                     make_unique<NodeExponent>(make_unique<NodeVar>(wrt),
-                                                               make_unique<NodeVal>(right->evaluate() - 1)));
+    return make_unique<NodeMultiply>(left->differentiate(wrt),
+                                    make_unique<NodeMultiply>(make_unique<NodeVal>(right->evaluate()),
+                                                              make_unique<NodeExponent>(left->clone(),
+                                                                                        make_unique<NodeVal>(right->evaluate() - 1))));
+}
+
+unique_ptr<NodeBase> NodeExponent::simplify() const {
+    unique_ptr<NodeBase> leftSimple = left->simplify();
+    unique_ptr<NodeBase> rightSimple = right->simplify();
+
+    NodeBase* leftVal = dynamic_cast<NodeVal*>(leftSimple.get());
+    NodeBase* rightVal = dynamic_cast<NodeVal*>(rightSimple.get());
+
+    // check for special simplification rules
+    if (leftVal != nullptr && rightVal != nullptr) {
+        return make_unique<NodeVal>(leftVal->evaluate() * rightVal->evaluate());
+    } else if (leftVal != nullptr && leftVal->evaluate() == 0) {
+        return make_unique<NodeVal>(0);
+    } else if (leftVal != nullptr && leftVal->evaluate() == 1) {
+        return make_unique<NodeVal>(1);
+    } else if (rightVal != nullptr && rightVal->evaluate() == 0) {
+        return make_unique<NodeVal>(1);
+    } else if (rightVal != nullptr && rightVal->evaluate() == 1) {
+        return leftSimple;
+    } else {
+        return clone();
+    }
 }

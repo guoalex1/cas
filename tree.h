@@ -26,6 +26,8 @@ public:
 
     virtual std::unique_ptr<NodeBase> clone() const = 0;
 
+    virtual std::unique_ptr<NodeBase> simplify() const = 0;
+
     int getPrecedence() const;
 
 protected:
@@ -37,8 +39,6 @@ public:
     UnaryNodeBase(std::unique_ptr<NodeBase> arg, int precedence);
     virtual ~UnaryNodeBase() = default;
 
-    virtual int evaluate() const = 0;
-
 protected:
     std::unique_ptr<NodeBase> arg;
 };
@@ -47,8 +47,6 @@ class BinaryNodeBase : public NodeBase {
 public:
     BinaryNodeBase(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right, int precedence);
     virtual ~BinaryNodeBase() = default;
-
-    virtual int evaluate() const = 0;
 
 protected:
     std::unique_ptr<NodeBase> left;
@@ -63,9 +61,11 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> clone() const override;
+
     std::unique_ptr<NodeBase> differentiate(char wrt) const override;
 
-    std::unique_ptr<NodeBase> clone() const override;
+    std::unique_ptr<NodeBase> simplify() const override;
 
 public:
     int val;
@@ -79,9 +79,11 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> clone() const override;
+
     std::unique_ptr<NodeBase> differentiate(char wrt) const override;
 
-    std::unique_ptr<NodeBase> clone() const override;
+    std::unique_ptr<NodeBase> simplify() const override;
 
 public:
     char symbol;
@@ -95,9 +97,11 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> clone() const override;
+
     std::unique_ptr<NodeBase> differentiate(char wrt) const override;
 
-    std::unique_ptr<NodeBase> clone() const override;
+    std::unique_ptr<NodeBase> simplify() const override;
 };
 
 class NodeSin : public UnaryNodeBase {
@@ -108,9 +112,11 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> clone() const override;
+
     std::unique_ptr<NodeBase> differentiate(char wrt) const override;
 
-    std::unique_ptr<NodeBase> clone() const override;
+    std::unique_ptr<NodeBase> simplify() const override;
 };
 
 class NodeCos : public UnaryNodeBase {
@@ -121,9 +127,11 @@ public:
 
     std::string toString() const override;
 
-    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
-    
     std::unique_ptr<NodeBase> clone() const override;
+
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
+
+    std::unique_ptr<NodeBase> simplify() const override;
 };
 
 class NodeExp : public UnaryNodeBase {
@@ -134,9 +142,11 @@ public:
 
     std::string toString() const override;
 
-    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
-    
     std::unique_ptr<NodeBase> clone() const override;
+
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
+
+    std::unique_ptr<NodeBase> simplify() const override;
 };
 
 class NodeLog : public UnaryNodeBase {
@@ -147,9 +157,11 @@ public:
 
     std::string toString() const override;
 
-    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
-    
     std::unique_ptr<NodeBase> clone() const override;
+
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
+
+    std::unique_ptr<NodeBase> simplify() const override;
 };
 
 class NodeAdd : public BinaryNodeBase {
@@ -160,9 +172,11 @@ public:
 
     std::string toString() const override;
 
-    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
-    
     std::unique_ptr<NodeBase> clone() const override;
+
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
+
+    std::unique_ptr<NodeBase> simplify() const override;
 };
 
 class NodeSubtract : public BinaryNodeBase {
@@ -170,12 +184,14 @@ public:
     NodeSubtract(std::unique_ptr<NodeBase> left, std::unique_ptr<NodeBase> right);
 
     int evaluate() const override;
-
+    
     std::string toString() const override;
 
-    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
-    
     std::unique_ptr<NodeBase> clone() const override;
+
+    std::unique_ptr<NodeBase> differentiate(char wrt) const override;
+
+    std::unique_ptr<NodeBase> simplify() const override;
 };
 
 class NodeMultiply : public BinaryNodeBase {
@@ -186,9 +202,11 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> clone() const override;
+
     std::unique_ptr<NodeBase> differentiate(char wrt) const override;
 
-    std::unique_ptr<NodeBase> clone() const override;
+    std::unique_ptr<NodeBase> simplify() const override;
 };
 
 class NodeDivide : public BinaryNodeBase {
@@ -199,9 +217,11 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> clone() const override;
+
     std::unique_ptr<NodeBase> differentiate(char wrt) const override;
 
-    std::unique_ptr<NodeBase> clone() const override;
+    std::unique_ptr<NodeBase> simplify() const override;
 };
 
 class NodeExponent : public BinaryNodeBase {
@@ -212,7 +232,9 @@ public:
 
     std::string toString() const override;
 
+    std::unique_ptr<NodeBase> clone() const override;
+
     std::unique_ptr<NodeBase> differentiate(char wrt) const override;
 
-    std::unique_ptr<NodeBase> clone() const override;
+    std::unique_ptr<NodeBase> simplify() const override;
 };
