@@ -124,7 +124,16 @@ unique_ptr<NodeBase> NodeSin::differentiate(char wrt) const {
 }
 
 unique_ptr<NodeBase> NodeSin::simplify() const {
-    return make_unique<NodeSin>(arg->simplify());
+    unique_ptr<NodeBase> argSimple = arg->simplify();
+
+    // check for special simplification rules
+    NodeVal* leftVal = dynamic_cast<NodeVal*>(argSimple.get());
+
+    if (leftVal != nullptr && argSimple->evaluate() == 0) {
+        return make_unique<NodeVal>(0);
+    } else {
+        return make_unique<NodeSin>(std::move(argSimple));
+    }
 }
 
 NodeCos::NodeCos(unique_ptr<NodeBase> arg)
@@ -149,7 +158,16 @@ unique_ptr<NodeBase> NodeCos::differentiate(char wrt) const {
 }
 
 unique_ptr<NodeBase> NodeCos::simplify() const {
-    return make_unique<NodeCos>(arg->simplify());
+    unique_ptr<NodeBase> argSimple = arg->simplify();
+
+    // check for special simplification rules
+    NodeVal* leftVal = dynamic_cast<NodeVal*>(argSimple.get());
+
+    if (leftVal != nullptr && argSimple->evaluate() == 0) {
+        return make_unique<NodeVal>(1);
+    } else {
+        return make_unique<NodeCos>(std::move(argSimple));
+    }
 }
 
 NodeExp::NodeExp(unique_ptr<NodeBase> arg)
@@ -175,6 +193,7 @@ unique_ptr<NodeBase> NodeExp::differentiate(char wrt) const {
 unique_ptr<NodeBase> NodeExp::simplify() const {
     unique_ptr<NodeBase> argSimple = arg->simplify();
 
+    // check for special simplification rules
     NodeVal* leftVal = dynamic_cast<NodeVal*>(argSimple.get());
 
     if (leftVal != nullptr && argSimple->evaluate() == 0) {
@@ -207,6 +226,7 @@ unique_ptr<NodeBase> NodeLog::differentiate(char wrt) const {
 unique_ptr<NodeBase> NodeLog::simplify() const {
     unique_ptr<NodeBase> argSimple = arg->simplify();
 
+    // check for special simplification rules
     NodeVal* leftVal = dynamic_cast<NodeVal*>(argSimple.get());
 
     if (leftVal != nullptr && argSimple->evaluate() == 1) {
